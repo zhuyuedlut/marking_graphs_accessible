@@ -39,6 +39,48 @@ CHART_TYPE_TOKENS = [
 new_tokens = SEPARATOR_TOKENS + CHART_TYPE_TOKENS
 
 
+def add_image_sizes(examples: Dict[str, Union[str, os.PathLike]]) -> Dict[str, List[int]]:
+    """
+    This function takes a dictionary of examples and adds the width and height of the
+    image to the dictionary. This is to be used with the `Dataset.map` function.
+
+    Args:
+        examples (dict): A dictionary of examples (from `map` function)
+
+    Returns:
+        dict: The dictionary with the width and height of the image added
+    """
+
+    sizes = [Image.open(x).size for x in examples["image_path"]]
+
+    width, height = list(zip(*sizes))
+
+    return {
+        "width": list(width),
+        "height": list(height),
+    }
+
+def gen_data(files: List[Union[str, os.PathLike]]) -> Dict[str, str]:
+    """
+    This function takes a list of json files and returns a generator that yields a
+    dictionary with the ground truth string and the path to the image.
+
+    Args:
+        files (list): A list of json files
+
+    Returns:
+        generator: A generator that yields a dictionary with the ground truth string and
+            the path to the corresponding image.
+    """
+
+    for f in files:
+
+        yield {
+            **get_gt_string_and_xy(f),
+            "image_path": str(images_path / f"{f.stem}.jpg"),
+        }
+
+
 def round_float(value: Union[int, float, str]) -> Union[str, float]:
     """
     Convert a float value to a string with the specified number of decimal places.
