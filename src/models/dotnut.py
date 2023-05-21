@@ -6,6 +6,7 @@ import torch
 from transformers import PreTrainedTokenizerBase, PreTrainedModel
 
 from config import CFG
+from src.models.loss import validation_metrics
 
 
 class DonutModelLPModule(pl.LightningModule):
@@ -57,4 +58,14 @@ class DonutModelLPModule(pl.LightningModule):
         self.val_ids = []
 
     def on_validation_epoch_end(self, outputs: List[Any]) -> None:
-        pass
+        metrics = validation_metrics(self.val_outputs, self.val_ids, self.gt_df)
+        print("\n", metrics)
+
+        self.log_dict(metrics)
+
+        self.val_outputs, self.val_ids = [], []
+
+    def configure_optimizers(self) -> torch.optim.Optimizer:
+        optimizer = torch.optim.Adam(self.parameters(), lr=CFG.lr)
+
+        return optimizer

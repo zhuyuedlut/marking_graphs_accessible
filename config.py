@@ -1,3 +1,6 @@
+from pathlib import Path
+
+
 class CFG:
     # General
     debug = False
@@ -24,3 +27,6 @@ class CFG:
     log_steps = 200
     batch_size = 2
     use_wandb = True
+
+    data_dir = Path("/home/zhuyuedlut/Code/marking_graphs_accessible/data/train")
+    pretrained_model_dir = Path("/home/zhuyuedlut/Pretrained_Model/donut-base")
